@@ -1,0 +1,161 @@
+---
+title: "Indicadores económicos de desigualdad de género"
+author: "Dirección de Promoción de Mujer Agraria Rural"
+output: 
+    flexdashboard::flex_dashboard:
+    orientation: rows
+    pdf_document:
+    beamer_presentation: doc
+    slide_level: 2
+    editor_options: 
+    chunk_output_type: inline
+---
+
+```{r setup, include=FALSE}
+library(ggplot2)
+library(plotly)
+library(plyr)
+library(flexdashboard)
+library(reshape2)
+library(dplyr)
+library(tidyverse)   
+#library(rmarkdown)
+
+
+# Make some noisily increasing data
+set.seed(955)
+library(readxl)
+data1 <- read_excel("d1.xlsx", sheet = "Hoja2")
+Porcentaje <-c(data1$Hombre, data1$Mujer)
+Género <-c(rep("Hombre", 20), rep("Mujer", 20))
+df <- data.frame(Porcentaje,Género)
+
+df_fill <- dcast(data1, Años ~ Género, fun.aggregate = sum) %>% melt(. , id = "Años")
+
+################################################################################
+
+
+```
+
+# Página 1
+
+## Row
+
+### Población sin ingresos propios por sexo (porcentaje)
+
+```{r}
+p <- ggplot(data = df_fill, aes(x = Años, y = Porcentaje, fill = Género))  + geom_bar(stat="identity", position="dodge")+ theme_bw() +   theme(panel.border = element_blank()) +labs(x="Año")
+
+ggplotly(p) 
+
+```
+
+### Tiempo Total de Trabajo según Tipo de Trabajo y Sexo (porcentaje)
+
+```{r}
+
+
+# Make some noisily increasing data
+library(readxl)
+data2 <- read_excel("d2.xlsx", sheet = "Hoja2")
+df_n2 <- data.frame(data2)
+
+#df_fill_2 <- dcast(df_n2, Porcentaje2 ~ Género2, fun.aggregate = sum) %>% melt(. , id = "Género2")
+
+p <- ggplot(data = df_n2,aes(x=Género, y=Porcentaje, fill = Tipo)) + 
+    geom_bar(width = .35,position="dodge", stat="identity") + theme_bw()  +   theme(panel.border = element_blank())
+ggplotly(p)
+
+```
+
+## Row
+
+### Índice de feminidad de la pobreza extrema según área geográfica (100 = paridad)
+
+```{r}
+library(readxl)
+data3 <- read_excel("d3.xlsx", sheet = "Hoja2")
+df_n3 <- data.frame(data3)
+
+p <- ggplot(df_n3,aes(x=Años, y = Índice, fill = Ámbito)) + geom_line(size = 1.2,stat="identity",aes(colour=Ámbito, group=Ámbito)) + theme_bw() +   theme(panel.border = element_blank())+labs(x="Año")
+ggplotly(p)
+
+```
+
+### Tasa de desocupación según sexo (porcentaje)
+
+```{r}
+library(readxl)
+data4 <- read_excel("d4.xlsx", sheet = "Hoja2")
+df_n4 <- data.frame(data4)
+
+p <- ggplot(df_n4,aes(x=Año, y = Porcentaje, fill = Género)) + geom_line(size = 1.2,stat="identity",aes(colour=Género, group=Género)) + theme_bw() +   theme(panel.border = element_blank())
+ggplotly(p)
+```
+
+# Página 2
+
+## Row
+
+### Superficie Agrícola que conducen mujeres y hombres, 2012 (# ha)
+
+```{r}
+
+df_n5 <- data.frame(
+  Género = c("Hombres", "Mujeres"),
+  Superficie = c(79, 21)
+  )
+
+p <- ggplot(df_n5,aes(x=Género, y = Superficie, fill = Género)) +
+geom_bar(width = .3, stat = "identity") + theme_bw() +  theme(panel.border = element_blank())
+
+ggplotly(p)
+```
+
+### Mujeres y hombres productores agropecuarios que gestionaron crédito, 2012 (porcentaje)
+
+```{r}
+
+df_n55 <- data.frame(
+  Género = c("Hombres", "Mujeres"),
+  Superficie = c(10.4, 6.4)
+  )
+
+p <- ggplot(df_n55,aes(x=Género, y = Superficie, fill = Género)) +
+geom_bar(width = .3, stat = "identity") + theme_bw() +  theme(panel.border = element_blank())
+
+ggplotly(p)
+
+```
+
+## Row
+
+### Tasa de analfabetismo de mujeres y hombres productores agropecuarios, por departamento, 2012 (porcentaje)
+
+```{r}
+library(lemon)
+library(readxl)
+data6 <- read_excel("d5.xlsx", sheet = "Hoja2")
+df_n6 <- data.frame(data6)
+
+library(tidyverse)
+
+p <- ggplot(df_n6, aes(x = ifelse (test = Género == "Mujeres", yes = -Porcentaje , no = Porcentaje), y = Departamento, fill = Género)) + theme_bw() + geom_bar(stat = "identity") + theme(panel.border = element_blank()) + geom_col() + scale_x_symmetric(labels = abs)+labs(x="Porcentaje")
+
+ggplotly(p)
+```
+
+### Mujeres y hombres productores agropecuarios que recibieron capacitación por departamentos, 2012 (porcentaje)
+
+```{r}
+library(lemon)
+library(readxl)
+data7 <- read_excel("d5.xlsx", sheet = "Hoja3")
+df_n7 <- data.frame(data7)
+
+library(tidyverse)
+
+p <- ggplot(df_n7, aes(x = ifelse (test = Género == "Mujeres", yes = -Porcentaje , no = Porcentaje), y = Departamento, fill = Género)) + theme_bw() + geom_bar(stat = "identity") + theme(panel.border = element_blank()) + geom_col() + scale_x_symmetric(labels = abs)+labs(x="Porcentaje")
+
+ggplotly(p)
+```
